@@ -9,6 +9,10 @@ import {
 import { NotificationService } from '../services/notification.service';
 
 function extractErrorMessage(error: HttpErrorResponse): string {
+  if (error.status === 0) {
+    return 'No se pudo conectar con la API. Verifica CORS en el backend o que el servicio este activo.';
+  }
+
   const body = error.error as ApiErrorBody | undefined;
 
   if (body?.message) {

@@ -6,13 +6,13 @@ Aplicación full stack para registrar series de televisión y sus directores, co
 
 ## Stack tecnológico
 
-| Capa | Tecnología |
-|------|------------|
-| Backend | Python 3.12, FastAPI, SQLAlchemy 2.x, Alembic, Pydantic v2 |
-| Frontend | Angular 19 (standalone components), Reactive Forms, HttpClient |
-| Base de datos | PostgreSQL 17 |
-| Contenedores | Docker, Docker Compose |
-| API docs | Swagger/OpenAPI autogenerado por FastAPI |
+| Capa          | Tecnología                                                     |
+| ------------- | -------------------------------------------------------------- |
+| Backend       | Python 3.12, FastAPI, SQLAlchemy 2.x, Alembic, Pydantic v2     |
+| Frontend      | Angular 19 (standalone components), Reactive Forms, HttpClient |
+| Base de datos | PostgreSQL 17                                                  |
+| Contenedores  | Docker, Docker Compose                                         |
+| API docs      | Swagger/OpenAPI autogenerado por FastAPI                       |
 
 ## Ejecución local (Docker)
 
@@ -33,13 +33,13 @@ docker compose up --build
 
 ### URLs locales
 
-| Servicio | URL |
-|----------|-----|
-| Frontend | http://localhost:4200 |
-| Backend API | http://localhost:8000/api |
-| Swagger (OpenAPI) | http://localhost:8000/docs |
-| Health check | http://localhost:8000/api/health |
-| PostgreSQL | `localhost:${POSTGRES_PORT}` (por defecto `5432`) |
+| Servicio          | URL                                               |
+| ----------------- | ------------------------------------------------- |
+| Frontend          | http://localhost:4200                             |
+| Backend API       | http://localhost:8000/api                         |
+| Swagger (OpenAPI) | http://localhost:8000/docs                        |
+| Health check      | http://localhost:8000/api/health                  |
+| PostgreSQL        | `localhost:${POSTGRES_PORT}` (por defecto `5432`) |
 
 ### pgAdmin (fuera de Docker)
 
@@ -55,16 +55,16 @@ Conéctate al Postgres expuesto por el contenedor:
 
 Copia [`.env.example`](.env.example) a `.env` en la raíz del proyecto:
 
-| Variable | Descripción | Ejemplo |
-|----------|-------------|---------|
-| `POSTGRES_USER` | Usuario de PostgreSQL | `oati` |
-| `POSTGRES_PASSWORD` | Contraseña de PostgreSQL | `oati_secret` |
-| `POSTGRES_DB` | Nombre de la base de datos | `series_db` |
-| `POSTGRES_PORT` | Puerto expuesto al host | `5432` |
-| `BACKEND_PORT` | Puerto del backend en el host | `8000` |
-| `FRONTEND_PORT` | Puerto del frontend en el host | `4200` |
-| `CORS_ORIGINS` | Orígenes permitidos (separados por coma) | `http://localhost:4200` |
-| `DEBUG` | Modo debug del backend (`true`/`false`) | `true` |
+| Variable            | Descripción                              | Ejemplo                 |
+| ------------------- | ---------------------------------------- | ----------------------- |
+| `POSTGRES_USER`     | Usuario de PostgreSQL                    | `oati`                  |
+| `POSTGRES_PASSWORD` | Contraseña de PostgreSQL                 | `oati_secret`           |
+| `POSTGRES_DB`       | Nombre de la base de datos               | `series_db`             |
+| `POSTGRES_PORT`     | Puerto expuesto al host                  | `5432`                  |
+| `BACKEND_PORT`      | Puerto del backend en el host            | `8000`                  |
+| `FRONTEND_PORT`     | Puerto del frontend en el host           | `4200`                  |
+| `CORS_ORIGINS`      | Orígenes permitidos (separados por coma) | `http://localhost:4200` |
+| `DEBUG`             | Modo debug del backend (`true`/`false`)  | `true`                  |
 
 El backend recibe `DATABASE_URL` construida automáticamente en `docker-compose.yml`. Referencia adicional en [`backend/.env.example`](backend/.env.example) para ejecución fuera de Docker.
 
@@ -87,13 +87,13 @@ PruebaOATI/
 │       ├── services/          # lógica de negocio
 │       └── routers/           # endpoints HTTP
 ├── frontend/
-│   ├── Dockerfile             # multi-stage: Node build + Nginx
-│   ├── nginx.conf             # SPA + reverse proxy /api/ (dev)
+│   ├── Dockerfile             # multi-stage: build + nginx (local | production)
+│   ├── nginx.conf             # SPA + reverse proxy /api/ (solo Docker Compose)
+│   ├── nginx.prod.conf        # SPA sin proxy (Render)
 │   └── src/app/
 │       ├── core/              # services, models, interceptors
 │       ├── features/          # series, directores
 │       └── shared/            # confirm-dialog, error-toast, spinner
-└── docs/
 ```
 
 ## Modelo de datos
@@ -138,23 +138,75 @@ erDiagram
 
 ## API — Endpoints
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| `GET` | `/api/health` | Health check |
-| `GET` | `/api/series` | Listar series (con directores embebidos) |
-| `GET` | `/api/series/{id}` | Detalle de serie |
-| `POST` | `/api/series` | Crear serie |
-| `PUT` | `/api/series/{id}` | Actualizar serie |
-| `DELETE` | `/api/series/{id}` | Soft delete de serie |
-| `POST` | `/api/series/{id}/directores/{director_id}` | Asignar director |
-| `DELETE` | `/api/series/{id}/directores/{director_id}` | Desasignar director |
-| `GET` | `/api/directores` | Listar directores (con series embebidas) |
-| `GET` | `/api/directores/{id}` | Detalle de director |
-| `POST` | `/api/directores` | Crear director |
-| `PUT` | `/api/directores/{id}` | Actualizar director |
-| `DELETE` | `/api/directores/{id}` | Soft delete de director |
+| Método   | Ruta                                        | Descripción                              |
+| -------- | ------------------------------------------- | ---------------------------------------- |
+| `GET`    | `/api/health`                               | Health check                             |
+| `GET`    | `/api/series`                               | Listar series (con directores embebidos) |
+| `GET`    | `/api/series/{id}`                          | Detalle de serie                         |
+| `POST`   | `/api/series`                               | Crear serie                              |
+| `PUT`    | `/api/series/{id}`                          | Actualizar serie                         |
+| `DELETE` | `/api/series/{id}`                          | Soft delete de serie                     |
+| `POST`   | `/api/series/{id}/directores/{director_id}` | Asignar director                         |
+| `DELETE` | `/api/series/{id}/directores/{director_id}` | Desasignar director                      |
+| `GET`    | `/api/directores`                           | Listar directores (con series embebidas) |
+| `GET`    | `/api/directores/{id}`                      | Detalle de director                      |
+| `POST`   | `/api/directores`                           | Crear director                           |
+| `PUT`    | `/api/directores/{id}`                      | Actualizar director                      |
+| `DELETE` | `/api/directores/{id}`                      | Soft delete de director                  |
 
-Documentación interactiva completa en **http://localhost:8000/docs** (Swagger autogenerado).
+Documentación interactiva completa en **http://localhost:8000/docs** (local) o **https://pruebaoati-backend.onrender.com/docs** (producción).
+
+## Despliegue en producción (Render)
+
+Tres servicios independientes (no se usa `docker-compose.yml` en Render):
+
+| Servicio     | Tipo en Render        | URL |
+| ------------ | --------------------- | --- |
+| PostgreSQL   | Managed PostgreSQL    | _(interno — ver Render dashboard)_ |
+| Backend      | Web Service (Docker)  | https://pruebaoati-backend.onrender.com |
+| Frontend     | Web Service (Docker)  | https://pruebaoati-frontend.onrender.com |
+
+**CORS en producción:** el backend debe incluir la URL del frontend en `CORS_ORIGINS`:
+
+```
+https://pruebaoati-frontend.onrender.com,http://localhost:4200
+```
+
+Si el frontend muestra **Http failure status 0**, casi siempre falta esa URL en `CORS_ORIGINS` del backend en Render.
+
+## URLs de producción
+
+| Servicio | URL |
+| -------- | --- |
+| **Frontend (entregable)** | https://pruebaoati-frontend.onrender.com |
+| Backend API | https://pruebaoati-backend.onrender.com/api |
+| Swagger | https://pruebaoati-backend.onrender.com/docs |
+| Health check | https://pruebaoati-backend.onrender.com/api/health |
+
+## Evidencia de funcionamiento
+
+### Local (Docker Compose)
+
+1. `docker compose up --build` levanta backend, frontend y PostgreSQL.
+2. Frontend en http://localhost:4200 — CRUD de series y directores.
+3. Asignación serie ↔ director desde ambos formularios.
+4. Soft delete: registros ocultos en listados, visibles en BD con `deleted_at`.
+5. Errores de API mostrados en toast (ej. serie inexistente → 404, asignación duplicada → 409).
+6. Swagger en `/docs` para probar la API directamente.
+
+### Producción (Render)
+
+Verificado en junio 2026:
+
+| Check | Resultado |
+| ----- | --------- |
+| Backend `/api/health` | 200 — `{"status":"ok"}` |
+| CORS frontend → backend | `access-control-allow-origin: https://pruebaoati-frontend.onrender.com` |
+| Frontend carga | 200 — https://pruebaoati-frontend.onrender.com |
+| API `/api/series` y `/api/directores` | 200 — responden desde el frontend |
+| Swagger público | https://pruebaoati-backend.onrender.com/docs |
+
+Flujo funcional en producción: crear director → crear serie → asignar director → listar en ambas vistas → editar → eliminar (soft delete).
 
 ## Arquitectura del backend
 
@@ -221,30 +273,6 @@ docker compose exec backend alembic current
 4. Ruta en `router` + registro en `main.py` si es router nuevo
 5. Servicio HTTP en `frontend/src/app/core/services/`
 6. Componente en `frontend/src/app/features/`
-
-## URLs de producción
-
-| Servicio | URL |
-|----------|-----|
-| Backend | https://pruebaoati-backend.onrender.com |
-| Swagger | https://pruebaoati-backend.onrender.com/docs |
-| Frontend | https://pruebaoati-frontend.onrender.com _(tras Fase 13)_ |
-
-Guías de despliegue:
-
-- [docs/DEPLOY_RENDER_BACKEND.md](docs/DEPLOY_RENDER_BACKEND.md)
-- [docs/DEPLOY_RENDER_FRONTEND.md](docs/DEPLOY_RENDER_FRONTEND.md)
-
-## Evidencia de funcionamiento
-
-Flujo verificado end-to-end en local:
-
-1. `docker compose up --build` levanta backend, frontend y PostgreSQL.
-2. Frontend en http://localhost:4200 — CRUD de series y directores.
-3. Asignación serie ↔ director desde ambos formularios.
-4. Soft delete: registros ocultos en listados, visibles en BD con `deleted_at`.
-5. Errores de API mostrados en toast (ej. serie inexistente → 404, asignación duplicada → 409).
-6. Swagger en `/docs` para probar la API directamente.
 
 ## Autor
 
