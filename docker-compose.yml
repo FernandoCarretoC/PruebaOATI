@@ -51,6 +51,9 @@ services:
   frontend:
     build:
       context: ./frontend
+      target: local
+      args:
+        API_URL: /api
     env_file:
       - .env
     ports:

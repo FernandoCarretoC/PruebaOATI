@@ -13,6 +13,13 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "http://localhost:4200"
     DEBUG: bool = False
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def normalize_database_url(cls, value: str) -> str:
+        if isinstance(value, str) and value.startswith("postgres://"):
+            return value.replace("postgres://", "postgresql://", 1)
+        return value
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: str | list[str]) -> str:

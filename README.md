@@ -226,9 +226,14 @@ docker compose exec backend alembic current
 
 | Servicio | URL |
 |----------|-----|
-| Frontend | _por definir_ |
-| Backend | _por definir_ |
-| Swagger | _por definir_/docs |
+| Backend | https://pruebaoati-backend.onrender.com |
+| Swagger | https://pruebaoati-backend.onrender.com/docs |
+| Frontend | https://pruebaoati-frontend.onrender.com _(tras Fase 13)_ |
+
+Guías de despliegue:
+
+- [docs/DEPLOY_RENDER_BACKEND.md](docs/DEPLOY_RENDER_BACKEND.md)
+- [docs/DEPLOY_RENDER_FRONTEND.md](docs/DEPLOY_RENDER_FRONTEND.md)
 
 ## Evidencia de funcionamiento
 
