@@ -1,5 +1,11 @@
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import (
+    AsignacionNotFoundError,
+    DirectorNotFoundError,
+    DirectorYaAsignadoError,
+    SerieNotFoundError,
+)
 from app.repositories import director_repository, serie_repository
 from app.schemas.director import (
     AsignarDirectorBody,
@@ -19,14 +25,18 @@ class DirectorService:
     def get_director(self, db: Session, director_id: int) -> DirectorResponse:
         director = director_repository.get_by_id(db, director_id)
         if director is None:
-            raise ValueError(f"Director con id {director_id} no encontrado")
+            raise DirectorNotFoundError(
+                f"Director con id {director_id} no encontrado"
+            )
         return director_to_response(director)
 
     def create_director(self, db: Session, data: DirectorCreate) -> DirectorResponse:
         director = director_repository.create(db, data)
         director = director_repository.get_by_id(db, director.id)
         if director is None:
-            raise ValueError("No fue posible recuperar el director creado")
+            raise DirectorNotFoundError(
+                "No fue posible recuperar el director creado"
+            )
         return director_to_response(director)
 
     def update_director(
@@ -34,14 +44,18 @@ class DirectorService:
     ) -> DirectorResponse:
         director = director_repository.get_by_id(db, director_id)
         if director is None:
-            raise ValueError(f"Director con id {director_id} no encontrado")
+            raise DirectorNotFoundError(
+                f"Director con id {director_id} no encontrado"
+            )
         director = director_repository.update(db, director, data)
         return director_to_response(director)
 
     def delete_director(self, db: Session, director_id: int) -> None:
         director = director_repository.get_by_id(db, director_id)
         if director is None:
-            raise ValueError(f"Director con id {director_id} no encontrado")
+            raise DirectorNotFoundError(
+                f"Director con id {director_id} no encontrado"
+            )
         director_repository.soft_delete(db, director)
 
     def assign_director_to_serie(
@@ -53,14 +67,16 @@ class DirectorService:
     ) -> SerieResponse:
         serie = serie_repository.get_by_id(db, serie_id)
         if serie is None:
-            raise ValueError(f"Serie con id {serie_id} no encontrada")
+            raise SerieNotFoundError(f"Serie con id {serie_id} no encontrada")
 
         director = director_repository.get_by_id(db, director_id)
         if director is None:
-            raise ValueError(f"Director con id {director_id} no encontrado")
+            raise DirectorNotFoundError(
+                f"Director con id {director_id} no encontrado"
+            )
 
         if director_repository.get_assignment(db, serie_id, director_id) is not None:
-            raise ValueError(
+            raise DirectorYaAsignadoError(
                 f"El director {director_id} ya esta asignado a la serie {serie_id}"
             )
 
@@ -69,7 +85,7 @@ class DirectorService:
 
         serie = serie_repository.get_by_id(db, serie_id)
         if serie is None:
-            raise ValueError(f"Serie con id {serie_id} no encontrada")
+            raise SerieNotFoundError(f"Serie con id {serie_id} no encontrada")
         return serie_to_response(serie)
 
     def unassign_director_from_serie(
@@ -77,11 +93,11 @@ class DirectorService:
     ) -> SerieResponse:
         serie = serie_repository.get_by_id(db, serie_id)
         if serie is None:
-            raise ValueError(f"Serie con id {serie_id} no encontrada")
+            raise SerieNotFoundError(f"Serie con id {serie_id} no encontrada")
 
         asignacion = director_repository.get_assignment(db, serie_id, director_id)
         if asignacion is None:
-            raise ValueError(
+            raise AsignacionNotFoundError(
                 f"No existe asignacion activa del director {director_id} "
                 f"a la serie {serie_id}"
             )
@@ -90,7 +106,7 @@ class DirectorService:
 
         serie = serie_repository.get_by_id(db, serie_id)
         if serie is None:
-            raise ValueError(f"Serie con id {serie_id} no encontrada")
+            raise SerieNotFoundError(f"Serie con id {serie_id} no encontrada")
         return serie_to_response(serie)
 
 

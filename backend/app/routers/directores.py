@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -17,13 +17,7 @@ def list_directores(db: Session = Depends(get_db)) -> list[DirectorResponse]:
 def get_director(
     director_id: int, db: Session = Depends(get_db)
 ) -> DirectorResponse:
-    try:
-        return director_service.get_director(db, director_id)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        ) from exc
+    return director_service.get_director(db, director_id)
 
 
 @router.post("", response_model=DirectorResponse, status_code=status.HTTP_201_CREATED)
@@ -40,21 +34,9 @@ def update_director(
     data: DirectorUpdate,
     db: Session = Depends(get_db),
 ) -> DirectorResponse:
-    try:
-        return director_service.update_director(db, director_id, data)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        ) from exc
+    return director_service.update_director(db, director_id, data)
 
 
 @router.delete("/{director_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_director(director_id: int, db: Session = Depends(get_db)) -> None:
-    try:
-        director_service.delete_director(db, director_id)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        ) from exc
+    director_service.delete_director(db, director_id)

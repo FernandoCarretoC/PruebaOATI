@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -17,13 +17,7 @@ def list_series(db: Session = Depends(get_db)) -> list[SerieResponse]:
 
 @router.get("/{serie_id}", response_model=SerieResponse)
 def get_serie(serie_id: int, db: Session = Depends(get_db)) -> SerieResponse:
-    try:
-        return serie_service.get_serie(db, serie_id)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        ) from exc
+    return serie_service.get_serie(db, serie_id)
 
 
 @router.post("", response_model=SerieResponse, status_code=status.HTTP_201_CREATED)
@@ -40,24 +34,12 @@ def update_serie(
     data: SerieUpdate,
     db: Session = Depends(get_db),
 ) -> SerieResponse:
-    try:
-        return serie_service.update_serie(db, serie_id, data)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        ) from exc
+    return serie_service.update_serie(db, serie_id, data)
 
 
 @router.delete("/{serie_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_serie(serie_id: int, db: Session = Depends(get_db)) -> None:
-    try:
-        serie_service.delete_serie(db, serie_id)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        ) from exc
+    serie_service.delete_serie(db, serie_id)
 
 
 @router.post(
@@ -71,21 +53,9 @@ def assign_director_to_serie(
     data: AsignarDirectorBody | None = None,
     db: Session = Depends(get_db),
 ) -> SerieResponse:
-    try:
-        return director_service.assign_director_to_serie(
-            db, serie_id, director_id, data
-        )
-    except ValueError as exc:
-        message = str(exc)
-        if "ya esta asignado" in message:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=message,
-            ) from exc
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=message,
-        ) from exc
+    return director_service.assign_director_to_serie(
+        db, serie_id, director_id, data
+    )
 
 
 @router.delete(
@@ -97,12 +67,4 @@ def unassign_director_from_serie(
     director_id: int,
     db: Session = Depends(get_db),
 ) -> SerieResponse:
-    try:
-        return director_service.unassign_director_from_serie(
-            db, serie_id, director_id
-        )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
-        ) from exc
+    return director_service.unassign_director_from_serie(db, serie_id, director_id)
