@@ -1,0 +1,8 @@
+<div class="toast-container">
+  @for (message of messages; track trackByIndex($index)) {
+    <div class="toast toast-{{ message.type }}">
+      <span>{{ message.message }}</span>
+      <button type="button" class="toast-close" (click)="dismiss(message)">×</button>
+    </div>
+  }
+</div>

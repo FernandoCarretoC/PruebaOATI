@@ -1,0 +1,77 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h2>{{ isEdit ? 'Editar serie' : 'Nueva serie' }}</h2>
+      <p>Completa la información de la serie</p>
+    </div>
+    <a routerLink="/series" class="btn-link">Volver al listado</a>
+  </header>
+
+  @if (loading) {
+    <app-loading-spinner />
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="form-card">
+      <label>
+        Nombre *
+        <input type="text" formControlName="nombre" />
+        @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+          <span class="field-error">El nombre es obligatorio</span>
+        }
+      </label>
+
+      <label>
+        Fecha de lanzamiento *
+        <input type="date" formControlName="fecha_lanzamiento" />
+        @if (form.get('fecha_lanzamiento')?.invalid && form.get('fecha_lanzamiento')?.touched) {
+          <span class="field-error">La fecha es obligatoria</span>
+        }
+      </label>
+
+      <label>
+        Género
+        <input type="text" formControlName="genero" />
+      </label>
+
+      <label>
+        Estado
+        <input type="text" formControlName="estado" placeholder="en emision, finalizada..." />
+      </label>
+
+      <label>
+        Descripción
+        <textarea rows="4" formControlName="descripcion"></textarea>
+      </label>
+
+      <section class="directores-section">
+        <h3>Directores</h3>
+        @if (!directoresDisponibles.length) {
+          <p class="hint">No hay directores registrados. Puedes crearlos en la sección Directores.</p>
+        } @else {
+          <div formArrayName="directores" class="directores-list">
+            @for (control of directoresFormArray.controls; track control.get('directorId')?.value; let i = $index) {
+              <div [formGroupName]="i" class="director-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" formControlName="selected" />
+                  {{ control.get('label')?.value }}
+                </label>
+                <input
+                  type="text"
+                  formControlName="rol"
+                  placeholder="Rol (ej. director principal)"
+                  [disabled]="!control.get('selected')?.value"
+                />
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <div class="form-actions">
+        <a routerLink="/series" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? 'Guardando...' : (isEdit ? 'Actualizar' : 'Crear') }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

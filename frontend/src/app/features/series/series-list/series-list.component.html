@@ -1,0 +1,55 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h2>Series</h2>
+      <p>Listado de series registradas</p>
+    </div>
+    <a routerLink="/series/new" class="btn-primary">Nueva serie</a>
+  </header>
+
+  @if (loading) {
+    <app-loading-spinner />
+  } @else if (!series.length) {
+    <p class="empty-state">No hay series registradas.</p>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Fecha lanzamiento</th>
+            <th>Género</th>
+            <th>Estado</th>
+            <th>Directores</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (serie of series; track serie.id) {
+            <tr>
+              <td>{{ serie.nombre }}</td>
+              <td>{{ serie.fecha_lanzamiento }}</td>
+              <td>{{ serie.genero || '—' }}</td>
+              <td>{{ serie.estado || '—' }}</td>
+              <td>{{ formatDirectores(serie) }}</td>
+              <td class="actions">
+                <a [routerLink]="['/series', serie.id, 'edit']" class="btn-link">Editar</a>
+                <button type="button" class="btn-link danger" (click)="openDeleteConfirm(serie)">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <app-confirm-dialog
+    [open]="confirmOpen"
+    [message]="'¿Eliminar la serie ' + (serieToDelete?.nombre || '') + '?'"
+    confirmLabel="Eliminar"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+  />
+</section>

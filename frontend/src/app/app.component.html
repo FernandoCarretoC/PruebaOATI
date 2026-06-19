@@ -1,3 +1,16 @@
-<h1>Series TV</h1>
-<p>Sistema de registro de series de television — OATI</p>
-<router-outlet />
+<app-error-toast />
+
+<header class="app-header">
+  <div class="brand">
+    <h1>Series TV</h1>
+    <p>Sistema de registro de series de television — OATI</p>
+  </div>
+  <nav>
+    <a routerLink="/series" routerLinkActive="active">Series</a>
+    <a routerLink="/directores" routerLinkActive="active">Directores</a>
+  </nav>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>
