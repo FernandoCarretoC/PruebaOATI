@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.core.config import settings
 import app.models  # noqa: F401 — registra modelos para Alembic y validación de imports
+from app.routers import series
 
 app = FastAPI(
     title="Series TV API",
@@ -9,6 +10,8 @@ app = FastAPI(
     version="0.1.0",
     debug=settings.DEBUG,
 )
+
+app.include_router(series.router)
 
 
 @app.get("/api/health")
