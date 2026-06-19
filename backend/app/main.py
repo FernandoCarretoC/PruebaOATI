@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.core.config import settings
+import app.models  # noqa: F401 — registra modelos para Alembic y validación de imports
 
 app = FastAPI(
     title="Series TV API",
