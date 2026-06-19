@@ -23,4 +23,25 @@ export const routes: Routes = [
         (m) => m.SeriesFormComponent
       ),
   },
+  {
+    path: 'directores',
+    loadComponent: () =>
+      import('./features/directores/directores-list/directores-list.component').then(
+        (m) => m.DirectoresListComponent
+      ),
+  },
+  {
+    path: 'directores/new',
+    loadComponent: () =>
+      import('./features/directores/directores-form/directores-form.component').then(
+        (m) => m.DirectoresFormComponent
+      ),
+  },
+  {
+    path: 'directores/:id/edit',
+    loadComponent: () =>
+      import('./features/directores/directores-form/directores-form.component').then(
+        (m) => m.DirectoresFormComponent
+      ),
+  },
 ];

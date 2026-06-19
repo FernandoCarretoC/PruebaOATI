@@ -1,0 +1,53 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h2>Directores</h2>
+      <p>Listado de directores registrados</p>
+    </div>
+    <a routerLink="/directores/new" class="btn-primary">Nuevo director</a>
+  </header>
+
+  @if (loading) {
+    <app-loading-spinner />
+  } @else if (!directores.length) {
+    <p class="empty-state">No hay directores registrados.</p>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Nacionalidad</th>
+            <th>Series</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (director of directores; track director.id) {
+            <tr>
+              <td>{{ director.nombre }}</td>
+              <td>{{ director.apellido }}</td>
+              <td>{{ director.nacionalidad || '—' }}</td>
+              <td>{{ formatSeries(director) }}</td>
+              <td class="actions">
+                <a [routerLink]="['/directores', director.id, 'edit']" class="btn-link">Editar</a>
+                <button type="button" class="btn-link danger" (click)="openDeleteConfirm(director)">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <app-confirm-dialog
+    [open]="confirmOpen"
+    [message]="'¿Eliminar al director ' + (directorToDelete ? fullName(directorToDelete) : '') + '?'"
+    confirmLabel="Eliminar"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+  />
+</section>
