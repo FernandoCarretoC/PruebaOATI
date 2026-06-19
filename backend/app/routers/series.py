@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.schemas.director import AsignarDirectorBody
 from app.schemas.serie import SerieCreate, SerieResponse, SerieUpdate
+from app.services.director_service import director_service
 from app.services.serie_service import serie_service
 
 router = APIRouter(prefix="/api/series", tags=["series"])
@@ -51,6 +53,54 @@ def update_serie(
 def delete_serie(serie_id: int, db: Session = Depends(get_db)) -> None:
     try:
         serie_service.delete_serie(db, serie_id)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+
+
+@router.post(
+    "/{serie_id}/directores/{director_id}",
+    response_model=SerieResponse,
+    status_code=status.HTTP_200_OK,
+)
+def assign_director_to_serie(
+    serie_id: int,
+    director_id: int,
+    data: AsignarDirectorBody | None = None,
+    db: Session = Depends(get_db),
+) -> SerieResponse:
+    try:
+        return director_service.assign_director_to_serie(
+            db, serie_id, director_id, data
+        )
+    except ValueError as exc:
+        message = str(exc)
+        if "ya esta asignado" in message:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=message,
+            ) from exc
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=message,
+        ) from exc
+
+
+@router.delete(
+    "/{serie_id}/directores/{director_id}",
+    response_model=SerieResponse,
+)
+def unassign_director_from_serie(
+    serie_id: int,
+    director_id: int,
+    db: Session = Depends(get_db),
+) -> SerieResponse:
+    try:
+        return director_service.unassign_director_from_serie(
+            db, serie_id, director_id
+        )
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
